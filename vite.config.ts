@@ -13,4 +13,15 @@ export default defineConfig({
       // Добавь свои алиасы по необходимости
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+        @use "@/styles/_var.scss" as *;
+        @use "@/styles/_function.scss" as *;
+        @use "@/styles/_mixins.scss" as *;
+        `,
+      },
+    },
+  },
 });

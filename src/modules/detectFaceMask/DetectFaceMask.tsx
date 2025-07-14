@@ -1,5 +1,5 @@
-import { CanvasComponent } from "@/components/CanvasComponent";
-import { WebcCamComponent } from "@/components/WebCamComponent";
+import { CanvasCam } from "@/components/canvasCam/CanvasCam";
+import { WebCam } from "@/components/webCam/WebCam";
 import { Camera } from "@mediapipe/camera_utils";
 import { FaceMesh } from "@mediapipe/face_mesh";
 import { useEffect, useRef } from "react";
@@ -89,8 +89,8 @@ export default function DetectFaceMask() {
 
   return (
     <div>
-      <WebcCamComponent webcamRef={webcamRef} />
-      <CanvasComponent canvasRef={canvasRef} />
+      <WebCam webcamRef={webcamRef} />
+      <CanvasCam canvasRef={canvasRef} />
     </div>
   );
 }

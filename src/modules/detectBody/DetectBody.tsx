@@ -1,5 +1,8 @@
-import { CanvasComponent } from "@/components/CanvasComponent";
-import { WebcCamComponent } from "@/components/WebCamComponent";
+import { CanvasCam } from "@/components/canvasCam/CanvasCam";
+import QuantityCounter from "@/components/quantityCounter/QuantityCounter";
+import { WebCam } from "@/components/webCam/WebCam";
+import { checkArmsPosition } from "@/exercises/handsUp";
+import { mainStore } from "@/stores/MainStore";
 import { drawKeypoints, drawSkeleton } from "@/utils/draw";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import "@tensorflow/tfjs-backend-webgl";
@@ -27,9 +30,8 @@ export default function DetectBody() {
 
   const runPosenet = async () => {
     try {
-      // Ждем инициализации TensorFlow.js и установки бэкенда
+      mainStore.setIsLoading(true);
       await tf.ready();
-
       const net = await poseDetection.createDetector(
         poseDetection.SupportedModels.PoseNet,
         detectorConfig
@@ -37,9 +39,11 @@ export default function DetectBody() {
 
       setInterval(() => {
         detect(net);
-      }, 100);
+      }, 50);
     } catch (error) {
-      console.error("Error initializing pose detection:", error);
+      mainStore.setIsError(true);
+    } finally {
+      mainStore.setIsLoading(false);
     }
   };
 
@@ -57,8 +61,10 @@ export default function DetectBody() {
 
       const poses = await net.estimatePoses(video, estimationConfig);
       const pose = poses[0];
-      console.log(pose["keypoints"]);
-      drawCanvas(pose, videoWidth!, videoHeight!, canvasRef);
+      if (pose) {
+        checkArmsPosition(pose.keypoints, videoHeight!);
+        drawCanvas(pose, videoWidth!, videoHeight!, canvasRef);
+      }
     }
   };
 
@@ -78,17 +84,16 @@ export default function DetectBody() {
 
   useEffect(() => {
     runPosenet();
-
-    // Очистка при размонтировании компонента
     return () => {
-      // Здесь можно добавить очистку ресурсов, если нужно
+      // Очистка при размонтировании
     };
   }, []);
 
   return (
     <div>
-      <WebcCamComponent webcamRef={webcamRef} />
-      <CanvasComponent canvasRef={canvasRef} />
+      <QuantityCounter />
+      <WebCam webcamRef={webcamRef} />
+      <CanvasCam canvasRef={canvasRef} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { CanvasComponent } from "@/components/CanvasComponent";
-import { WebcCamComponent } from "@/components/WebCamComponent";
+import { CanvasCam } from "@/components/canvasCam/CanvasCam";
+import { WebCam } from "@/components/webCam/WebCam";
 import * as faceapi from "face-api.js";
 import { useEffect, useRef } from "react";
 import Webcam from "react-webcam";
@@ -89,8 +89,8 @@ export default function DetectAgeEmoGen() {
 
   return (
     <div>
-      <WebcCamComponent webcamRef={webcamRef} />
-      <CanvasComponent canvasRef={canvasRef} />
+      <WebCam webcamRef={webcamRef} />
+      <CanvasCam canvasRef={canvasRef} />
     </div>
   );
 }

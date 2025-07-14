@@ -1,0 +1,46 @@
+@use "./function.scss" as *;
+@use "./var.scss" as *;
+
+html {
+    box-sizing: border-box;
+    font-size: calc(100vw / 900 * 10);
+    padding: getRem(10);
+}
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: serif;
+}
+
+ul,
+li {
+    padding: unset;
+    margin: unset;
+    list-style: none;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    border: unset;
+    background: unset;
+    cursor: pointer;
+    &:disabled {
+        cursor: unset;
+    }
+}
+
+.btn-green {
+    background: $colorFernFrond;
+    color: $colorWhite;
+    font-size: getRem(15);
+    padding: getRem(5) getRem(10);
+    border-radius: getRem(5);
+    border: getRem(1) solid $colorFernFrond;
+}

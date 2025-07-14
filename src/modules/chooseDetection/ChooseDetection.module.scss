@@ -1,0 +1,4 @@
+.container {
+    @include FlexColumnCenterCenter;
+    gap: getRem(10);
+}

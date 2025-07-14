@@ -1,4 +1,5 @@
 import { Detections } from "@/enum/detections";
+import styles from "./ChooseDetection.module.scss";
 
 export function ChooseDetection({
   handleClick,
@@ -6,8 +7,9 @@ export function ChooseDetection({
   handleClick: (detection: Detections) => void;
 }) {
   return (
-    <div className="App">
+    <div className={styles.container}>
       <button
+        className="btn-green"
         onClick={() => {
           handleClick(Detections.FaceMask);
         }}
@@ -15,6 +17,7 @@ export function ChooseDetection({
         Детектор маски лица
       </button>
       <button
+        className="btn-green"
         onClick={() => {
           handleClick(Detections.Body);
         }}
@@ -22,6 +25,7 @@ export function ChooseDetection({
         Детектор тела
       </button>
       <button
+        className="btn-green"
         onClick={() => {
           handleClick(Detections.AgeEmoGen);
         }}
