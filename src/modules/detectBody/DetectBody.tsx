@@ -9,83 +9,79 @@ import "@tensorflow/tfjs-backend-webgl";
 import * as tf from "@tensorflow/tfjs-core";
 import { useEffect, useRef } from "react";
 import Webcam from "react-webcam";
+import { detectorConfig, estimationConfig } from "./config";
 
 export default function DetectBody() {
-  const webcamRef = useRef<Webcam | null>(null);
+  const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const detectorConfig: poseDetection.PosenetModelConfig = {
-    architecture: "MobileNetV1",
-    outputStride: 16,
-    inputResolution: { width: 640, height: 480 },
-    multiplier: 0.75,
-  };
-
-  const estimationConfig = {
-    maxPoses: 1,
-    flipHorizontal: false,
-    scoreThreshold: 0.5,
-    nmsRadius: 20,
-  };
+  const detectionIntervalRef = useRef<NodeJS.Timeout>(null);
 
   const runPosenet = async () => {
     try {
       mainStore.setIsLoading(true);
       await tf.ready();
-      const net = await poseDetection.createDetector(
+      const detector = await poseDetection.createDetector(
         poseDetection.SupportedModels.PoseNet,
         detectorConfig
       );
 
-      setInterval(() => {
-        detect(net);
+      detectionIntervalRef.current = setInterval(() => {
+        if (detector) {
+          detect(detector);
+        }
       }, 50);
-    } catch (error) {
+    } catch {
       mainStore.setIsError(true);
     } finally {
       mainStore.setIsLoading(false);
     }
   };
 
-  const detect = async (net: any) => {
+  const detect = async (detector: poseDetection.PoseDetector) => {
     if (
-      typeof webcamRef.current !== "undefined" &&
-      webcamRef.current !== null &&
-      webcamRef.current.video!.readyState === 4
+      webcamRef.current &&
+      webcamRef.current.video &&
+      webcamRef.current.video.readyState === 4
     ) {
       const video = webcamRef.current.video;
-      const videoWidth = webcamRef.current.video?.videoWidth;
-      const videoHeight = webcamRef.current.video?.videoHeight;
-      if (videoWidth) webcamRef.current.video!.width = videoWidth;
-      if (videoHeight) webcamRef.current.video!.height = videoHeight;
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
 
-      const poses = await net.estimatePoses(video, estimationConfig);
+      video.width = videoWidth;
+      video.height = videoHeight;
+
+      const poses = await detector.estimatePoses(video, estimationConfig);
       const pose = poses[0];
-      if (pose) {
-        checkArmsPosition(pose.keypoints, videoHeight!);
-        drawCanvas(pose, videoWidth!, videoHeight!, canvasRef);
+
+      if (pose && canvasRef.current) {
+        checkArmsPosition(pose.keypoints, videoHeight);
+        drawCanvas(pose, videoWidth, videoHeight);
       }
     }
   };
 
   const drawCanvas = (
-    pose: any,
+    pose: poseDetection.Pose,
     videoWidth: number,
-    videoHeight: number,
-    canvas: any
+    videoHeight: number
   ) => {
-    const ctx = canvas.current.getContext("2d");
-    canvas.current.width = videoWidth;
-    canvas.current.height = videoHeight;
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx || !canvasRef.current) return;
 
-    drawKeypoints(pose["keypoints"], 0.5, ctx);
-    drawSkeleton(pose["keypoints"], 0.5, ctx);
+    canvasRef.current.width = videoWidth;
+    canvasRef.current.height = videoHeight;
+
+    drawKeypoints(pose.keypoints, 0.5, ctx);
+    drawSkeleton(pose.keypoints, 0.5, ctx);
   };
 
   useEffect(() => {
     runPosenet();
+
     return () => {
-      // Очистка при размонтировании
+      if (detectionIntervalRef.current) {
+        clearInterval(detectionIntervalRef.current);
+      }
     };
   }, []);
 

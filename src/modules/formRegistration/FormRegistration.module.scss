@@ -1,0 +1,11 @@
+.form-wrapper {
+    @include FlexColumnCenterCenter;
+    gap: getRem(10);
+    padding: getRem(10);
+    border: getRem(1) solid $colorCodGray;
+
+    .form-group {
+        @include FlexRowSpaceBetweenCenter;
+        gap: getRem(5);
+    }
+}

@@ -1,0 +1,14 @@
+.btn {
+    width: getRem(40);
+    height: getRem(40);
+    svg {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.header-wrapper {
+    @include FlexRowSpaceBetweenCenter;
+    border: getRem(1) solid $colorCodGray;
+    padding: getRem(5);
+}
